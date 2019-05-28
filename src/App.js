@@ -1,8 +1,9 @@
 import React, {Component} from "react";
 import "./App.css";
-import FormInput from "./components/FornInput";
-import toastr from 'toastr';
+import FormInput          from "./components/FornInput";
+import toastr             from 'toastr';
 import 'toastr/build/toastr.min.css';
+import Contacts           from "./components/Contacts";
 
 class App extends Component{
   state = {
@@ -60,21 +61,36 @@ class App extends Component{
     // save in the local storage
     localStorage.setItem('user_contacts', JSON.stringify(user_contacts));
     this.setState({
-      contacts: user_contacts, loading:false
+      contacts: user_contacts,
+      loading:false,
+      name: '',
+      email: '',
+      phone_number: ''
     });
     return toastr.success('Details saved successfully');
   };
   getContacts() {
     let contacts = JSON.parse(localStorage.getItem('user_contacts'))
     this.setState({contacts}, () => {
-      console.log(this.state.contacts)
     });
   }
+  getContactForEdit = (contact) => {
+    this.setState({
+      name: contact.name,
+      email: contact.email,
+      phone_number: contact.phone_number
+    })
+  };
+  deleteContact = (i, ) => {
+   this.state.contacts.splice(i, 1,);
+   localStorage.setItem('user_contacts', JSON.stringify(this.state.contacts));
+   this.setState({contacts: this.state.contacts})
+  };
   componentDidMount() {
     this.getContacts();
   }
   render() {
-    const { name, email, phone_number, loading} = this.state;
+    const { name, email, phone_number, loading, contacts} = this.state;
     return (
       <div className="App">
         <header className="App-header">
@@ -87,6 +103,7 @@ class App extends Component{
            <FormInput type='tel' placeholder='Enter the number of your contact' name="phone_number" value={phone_number} onChange={this.onChange}  className='form_input'/>
            <button className='form_input form_btn' disabled={loading}>Add</button>
          </form>
+         <Contacts contacts={contacts} className="contacts" getContactForEdit={this.getContactForEdit} deleteContact={this.deleteContact}/>
        </div>
       </div>
     );
